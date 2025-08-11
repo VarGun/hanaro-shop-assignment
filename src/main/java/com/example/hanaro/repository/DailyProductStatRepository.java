@@ -5,6 +5,7 @@ import com.example.hanaro.entity.DailyProductStat.DailyProductStatId;
 import java.time.LocalDate;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -14,4 +15,8 @@ public interface DailyProductStatRepository extends
   @Query("select d from DailyProductStat d where d.id.statDate between :from and :to order by d.id.statDate asc")
   List<DailyProductStat> findByStatDateBetweenOrderByStatDateAsc(@Param("from") LocalDate from,
       @Param("to") LocalDate to);
+
+  @Modifying(clearAutomatically = true, flushAutomatically = true)
+  @Query("delete from DailyProductStat d where d.id.statDate = :date")
+  int deleteByDate(@Param("date") LocalDate date);
 }

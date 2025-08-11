@@ -91,7 +91,6 @@ public class AdminSeedConfig {
       } else {
         System.out.println("[SEED] Product already exists: " + seedProductName2);
       }
-      // ==== END TEMP SEEDING ====
     };
   }
 }

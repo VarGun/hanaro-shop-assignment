@@ -61,7 +61,7 @@ public class Cart {
 
     if (existing != null) {
       int newQty = existing.getQuantity() + quantity;
-      this.cartItems.remove(existing); // orphanRemoval=true → 기존 행 제거 예정
+      this.cartItems.remove(existing);
       CartItem merged = CartItem.builder()
           .cart(this)
           .product(product)

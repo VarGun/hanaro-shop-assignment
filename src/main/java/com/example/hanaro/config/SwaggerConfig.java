@@ -30,7 +30,6 @@ public class SwaggerConfig {
         .build();
   }
 
-  // OpenAPI 및 JWT Bearer 인증 스키마 설정 (Swagger UI의 Authorize 버튼 활성화)
   @Bean
   public OpenAPI customOpenAPI() {
     final String securitySchemeName = "bearerAuth";

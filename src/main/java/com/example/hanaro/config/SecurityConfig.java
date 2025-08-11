@@ -9,6 +9,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -19,6 +20,7 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
+@EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
@@ -61,12 +63,8 @@ public class SecurityConfig {
             // Swagger & OpenAPI (public)
             .requestMatchers(
                 "/v3/**",
-                "/v3/api-docs",
-                "/v3/api-docs/**",
                 "/swagger-ui.html",
                 "/swagger-ui/**",
-                "/swagger-resources/**",
-                "/webjars/**",
                 "/actuator/health",
                 "/actuator/metrics/**"
             ).permitAll()
@@ -77,7 +75,9 @@ public class SecurityConfig {
                 "/api/auth/signup",
                 "/api/auth/signup-admin",
                 "/h2-console/**",
-                "/uploads/**"
+                "/uploads/**",
+                "/resources/**",
+                "/static/**"
             ).permitAll()
             .requestMatchers(HttpMethod.GET, "/api/products", "/api/products/**").permitAll()
 

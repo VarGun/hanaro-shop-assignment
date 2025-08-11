@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -33,15 +35,15 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class OrderService {
 
+  private static final Logger bizOrderLog = LoggerFactory.getLogger("business.order");
+  private static final Logger bizProductLog = LoggerFactory.getLogger("business.product"); // 추가
+
   private final OrderRepository orderRepository;
   private final CartRepository cartRepository;
   private final ProductRepository productRepository;
   private final DailySalesStatRepository dailySalesStatRepository;
   private final DailyProductStatRepository dailyProductStatRepository;
 
-  /**
-   * 장바구니 → 주문 생성 - 장바구니 존재/비어있음/재고 검증 - 주문 아이템 생성 및 총액 계산 - 재고 차감 - 장바구니 비우기
-   */
   @Transactional
   public OrderResponse createFromCart(Long userId) {
     Cart cart = cartRepository.findByUser_Id(userId)
@@ -83,24 +85,25 @@ public class OrderService {
       order.addOrderItem(oi);
       total += unitPrice * qty;
 
-      // 재고 차감
+      // 재고 차감 + 로그
+      int before = p.getStockQuantity();
       p.decreaseStock(qty);
-      productRepository.save(p); // 재고 반영
-    }
+      int after = p.getStockQuantity();
+      productRepository.save(p);
 
-    // 연관관계 설정 (Order ↔ OrderItem)
-    // Order 엔티티에 items 컬렉션이 있고 Cascade.ALL이라면 save(order)만으로 전파됨
+      bizProductLog.info(
+          "[STOCK][ORDER][DECREASE] productId={}, name='{}', before={}, delta=-{}, after={}",
+          p.getId(), p.getName(), before, qty, after);
+    }
 
     order.updateTotalPrice(total);
 
     Order saved = orderRepository.save(order);
 
-    // 장바구니 비우기(또는 삭제)
     cart.getCartItems().clear();
-    // cartRepository.delete(cart); // 장바구니 자체 삭제를 원하면 이 방식으로 전환
-    // 비우기만 할 거면 아래 저장 유지
-    // cartRepository.save(cart);
 
+    bizOrderLog.info("[CREATE] orderId={}, userId={}, totalPrice={}", saved.getId(),
+        saved.getUser() != null ? saved.getUser().getId() : null, saved.getTotalPrice());
     return OrderResponse.from(saved);
   }
 
@@ -128,18 +131,6 @@ public class OrderService {
   }
 
   /**
-   * 관리자 검색 (전체 사용자 대상)
-   */
-  @Transactional(readOnly = true)
-  public Page<OrderResponse> adminSearch(OrderStatus status,
-      LocalDateTime from,
-      LocalDateTime to,
-      Pageable pageable) {
-    return orderRepository.adminSearch(status, from, to, pageable)
-        .map(OrderResponse::from);
-  }
-
-  /**
    * 관리자: 상태 변경 - 유효 전이만 허용(예시 정책)
    */
   @Transactional
@@ -149,11 +140,11 @@ public class OrderService {
 
     OrderStatus current = order.getStatus();
     if (!isValidTransition(current, target)) {
-      throw new IllegalStateException("해당 상태로 변경할 수 없습니다. (" + current + " → " + target + ")");
+      throw new IllegalStateException("해당 상태로 변경할 수 없습니다. (" + current + " -> " + target + ")");
     }
 
     order.changeStatus(target);
-    // 배송중→취소 같은 정책을 허용하지 않는다면 위 isValidTransition에서 막힘
+    bizOrderLog.info("[STATUS][MANUAL] orderId={}, {} -> {}", orderId, current, target);
   }
 
   /**
@@ -172,7 +163,7 @@ public class OrderService {
     }
 
     if (!isValidTransition(current, target)) {
-      throw new IllegalStateException("해당 상태로 변경할 수 없습니다. (" + current + " → " + target + ")");
+      throw new IllegalStateException("해당 상태로 변경할 수 없습니다. (" + current + " -> " + target + ")");
     }
 
     // 관리자에 의해 CANCELED로 전환될 때 재고 롤백 보장
@@ -184,18 +175,25 @@ public class OrderService {
           }
           Product p = oi.getProduct();
           if (p != null) {
+            int before = p.getStockQuantity();
             p.increaseStock(oi.getQuantity());
+            int after = p.getStockQuantity();
             productRepository.save(p);
+
+            bizProductLog.info(
+                "[STOCK][ADMIN-CANCEL][INCREASE] productId={}, name='{}', before={}, delta=+{}, after={}, orderId={}",
+                p.getId(), p.getName(), before, oi.getQuantity(), after, order.getId());
           }
         }
       }
     }
 
     order.changeStatus(target);
+    bizOrderLog.info("[STATUS][ADMIN] orderId={}, {} -> {}", orderId, current, target);
   }
 
   /**
-   * 사용자: 주문 취소 (본인만, 허용 상태에서만) - 예: ORDERED/SHIPPING까지만 취소 허용 - 재고 복원
+   * 사용자: 주문 취소 (본인만, 허용 상태에서만) - 예: ORDERED/READY/SHIPPING까지만 취소 허용 - 재고 복원
    */
   @Transactional
   public void cancel(Long orderId, Long userId) {
@@ -205,7 +203,8 @@ public class OrderService {
       throw new AccessDeniedException("본인 주문만 취소할 수 있습니다.");
     }
 
-    if (!(order.getStatus() == OrderStatus.ORDERED || order.getStatus() == OrderStatus.SHIPPING)) {
+    if (!(order.getStatus() == OrderStatus.ORDERED || order.getStatus() == OrderStatus.READY
+        || order.getStatus() == OrderStatus.SHIPPING)) {
       throw new IllegalStateException("취소할 수 없는 상태입니다. (" + order.getStatus() + ")");
     }
 
@@ -214,14 +213,21 @@ public class OrderService {
     }
 
     // 재고 복원
+    bizOrderLog.info("[CANCEL][USER] orderId={}, userId={}, statusBefore={}", orderId, userId,
+        order.getStatus());
     for (OrderItem oi : order.getOrderItems()) {
       if (oi == null) {
         continue;
       }
       Product p = oi.getProduct();
       if (p != null) {
+        int before = p.getStockQuantity();
         p.increaseStock(oi.getQuantity());
+        int after = p.getStockQuantity();
         productRepository.save(p);
+        bizProductLog.info(
+            "[STOCK][USER-CANCEL][INCREASE] productId={}, name='{}', before={}, delta=+{}, after={}, orderId={}, userId={}",
+            p.getId(), p.getName(), before, oi.getQuantity(), after, order.getId(), userId);
       }
     }
 
@@ -236,13 +242,13 @@ public class OrderService {
     }
     switch (current) {
       case ORDERED:
-        return target == OrderStatus.SHIPPING || target == OrderStatus.COMPLETED
-            || target == OrderStatus.CANCELED;
+        return target == OrderStatus.READY || target == OrderStatus.CANCELED;
+      case READY:
+        return target == OrderStatus.SHIPPING || target == OrderStatus.CANCELED;
       case SHIPPING:
         return target == OrderStatus.COMPLETED || target == OrderStatus.CANCELED;
       case COMPLETED:
       case CANCELED:
-        return false;
       default:
         return false;
     }
@@ -254,35 +260,46 @@ public class OrderService {
         .map(OrderResponse::from);
   }
 
-  //  @Scheduled(cron = "0 */5 * * * *") // 5분마다
-  @Scheduled(cron = "*/15 * * * * *") // [LOCAL TEST] 15초마다 (ORDERED → SHIPPING)
+  @Scheduled(fixedRate = 300000)
   @Transactional
-  public void moveOrderedToShipping() {
-    int updated = orderRepository.bulkUpdateStatus(OrderStatus.ORDERED, OrderStatus.SHIPPING);
-    log.info("[SCHED] ORDERED→SHIPPING updated={}", updated);
+  public void moveOrderedToReady() {
+    LocalDateTime threshold = LocalDateTime.now().minusMinutes(5); // 5분 체류 보장 (운영)
+    int updated = orderRepository.bulkUpdateStatusAfter(OrderStatus.ORDERED, OrderStatus.READY,
+        threshold);
+    log.info("[SCHED] ORDERED -> READY updated={}", updated);
   }
 
-  //  @Scheduled(cron = "0 0 * * * *") // 1시간마다
-  @Scheduled(cron = "*/30 * * * * *") // [LOCAL TEST] 30초마다 (SHIPPING → COMPLETED)
+  @Scheduled(fixedRate = 900000)
+  @Transactional
+  public void moveReadyToShipping() {
+    LocalDateTime threshold = LocalDateTime.now().minusMinutes(15); // 15분 체류 보장 (운영)
+    int updated = orderRepository.bulkUpdateStatusAfter(OrderStatus.READY, OrderStatus.SHIPPING,
+        threshold);
+    log.info("[SCHED] READY -> SHIPPING updated={}", updated);
+  }
+
+  @Scheduled(fixedRate = 3600000)
   @Transactional
   public void moveShippingToCompleted() {
-    int updated = orderRepository.bulkUpdateStatus(OrderStatus.SHIPPING, OrderStatus.COMPLETED);
-    log.info("[SCHED] SHIPPING→COMPLETED updated={}", updated);
+    LocalDateTime threshold = LocalDateTime.now().minusHours(1); // 1시간 체류 보장 (운영)
+    int updated = orderRepository.bulkUpdateStatusAfter(OrderStatus.SHIPPING, OrderStatus.COMPLETED,
+        threshold);
+    log.info("[SCHED] SHIPPING -> COMPLETED updated={}", updated);
   }
 
-  // 테스트용 (30초마다)
-  @Scheduled(cron = "*/30 * * * * *") // [TEST] 30초마다
-  //  @Scheduled(cron = "0 5 0 * * *") // 매일 00:05, 전일 통계 집계
+  // 테스트용 (전일 통계 집계)
+//  @Scheduled(cron = "0 0 0 * * *") // 매일 00:00, 전일 통계 집계
+  @Scheduled(cron = "*/30 * * * * *")
   @Transactional
   public void collectDailyStats() {
 //    LocalDate target = LocalDate.now().minusDays(1); // 전일
-//    LocalDateTime from = target.atStartOfDay();
-//    LocalDateTime to = target.plusDays(1).atStartOfDay(); // 반개방 구간 [from, to)
-
-    // [테스트 전용] 오늘로 전환
     LocalDate target = LocalDate.now();
     LocalDateTime from = target.atStartOfDay();
     LocalDateTime to = target.plusDays(1).atStartOfDay();
+
+    // 재집계 대비: 해당 일자 통계 삭제 후 재생성 (idempotent)
+    dailyProductStatRepository.deleteByDate(target);
+    dailySalesStatRepository.deleteByDate(target);
 
     long orderCount = orderRepository.countByStatusAndDateBetween(OrderStatus.COMPLETED, from, to);
     Long totalAmount = orderRepository.sumTotalPriceByStatusAndDateBetween(OrderStatus.COMPLETED,

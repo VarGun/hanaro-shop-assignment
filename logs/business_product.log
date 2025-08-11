@@ -1,0 +1,8 @@
+2025-08-11 21:46:08.065 [http-nio-8080-exec-4] INFO  business.product - [STOCK][ORDER][DECREASE] productId=1, name='Product233', before=20, delta=-4, after=16
+2025-08-11 21:46:08.065 [http-nio-8080-exec-4] INFO  business.product - [STOCK][ORDER][DECREASE] productId=2, name='Product22', before=20, delta=-8, after=12
+2025-08-11 22:04:09.418 [http-nio-8080-exec-10] INFO  business.product - [STOCK][ORDER][DECREASE] productId=1, name='Product233', before=20, delta=-1, after=19
+2025-08-11 22:04:09.419 [http-nio-8080-exec-10] INFO  business.product - [STOCK][ORDER][DECREASE] productId=2, name='Product22', before=20, delta=-2, after=18
+2025-08-11 22:18:43.130 [http-nio-8080-exec-8] INFO  business.product - [STOCK][ORDER][DECREASE] productId=1, name='Product233', before=20, delta=-1, after=19
+2025-08-11 22:18:43.130 [http-nio-8080-exec-8] INFO  business.product - [STOCK][ORDER][DECREASE] productId=2, name='Product22', before=20, delta=-2, after=18
+2025-08-11 22:19:42.563 [http-nio-8080-exec-2] INFO  business.product - [STOCK][ORDER][DECREASE] productId=1, name='Product233', before=19, delta=-3, after=16
+2025-08-11 22:19:42.565 [http-nio-8080-exec-2] INFO  business.product - [STOCK][ORDER][DECREASE] productId=2, name='Product22', before=18, delta=-9, after=9

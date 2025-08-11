@@ -12,6 +12,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -46,6 +48,18 @@ public class Order {
   @Column(nullable = false)
   private LocalDateTime statusChangedAt;
 
+  @Column(nullable = false)
+  private LocalDateTime updatedAt;
+
+  @PrePersist
+  public void onCreate() {
+    updatedAt = LocalDateTime.now();
+  }
+
+  @PreUpdate
+  public void onUpdate() {
+    updatedAt = LocalDateTime.now();
+  }
 
   @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<OrderItem> orderItems = new ArrayList<>();
@@ -56,8 +70,6 @@ public class Order {
     this.status = OrderStatus.ORDERED;
     this.orderDate = LocalDateTime.now();
     this.statusChangedAt = this.orderDate;
-    // orderItems는 필드에서 이미 new ArrayList<>()로 초기화되어 있음
-    // totalPrice는 아이템 추가 후 서비스에서 updateTotalPrice(...)로 반영
   }
 
   public int calculateTotalPrice() {
