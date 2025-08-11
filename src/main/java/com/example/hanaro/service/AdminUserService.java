@@ -3,9 +3,8 @@ package com.example.hanaro.service;
 import com.example.hanaro.dto.UserResponse;
 import com.example.hanaro.entity.User;
 import com.example.hanaro.repository.UserRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,11 +14,6 @@ public class AdminUserService {
 
   private final UserRepository userRepository;
 
-  @Transactional(readOnly = true)
-  public Page<UserResponse> list(Pageable pageable) {
-    return userRepository.findAll(pageable).map(UserResponse::from);
-  }
-
   @Transactional
   public void delete(Long userId) {
     // 하드 삭제(요구사항 충족 최소안). 소프트 삭제 필요 시 flag 추가.
@@ -28,4 +22,11 @@ public class AdminUserService {
     userRepository.delete(u);
   }
 
+  public List<UserResponse> search(String q) {
+    String keyword = (q == null || q.isBlank()) ? null : q.trim();
+    return userRepository.searchForAdmin(keyword)
+        .stream()
+        .map(UserResponse::from)
+        .toList();
+  }
 }
