@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+  <!-- 로그 경로: application-*.properties의 LOG_PATH 사용, 기본값 logs -->
+  <property name="LOG_PATH" value="${LOG_PATH:-logs}"/>
+
+  <!-- 공통 패턴 -->
+  <property name="PATTERN"
+    value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"/>
+
+  <!-- 콘솔 -->
+  <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>${PATTERN}</pattern>
+    </encoder>
+  </appender>
+
+  <!-- 애플리케이션 전체 로그: app.log (일자별 롤링) -->
+  <appender name="APP_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${LOG_PATH}/app.log</file>
+    <encoder>
+      <pattern>${PATTERN}</pattern>
+    </encoder>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>${LOG_PATH}/app.%d{yyyy-MM-dd}.log</fileNamePattern>
+      <maxHistory>7</maxHistory>
+      <totalSizeCap>1GB</totalSizeCap>
+    </rollingPolicy>
+  </appender>
+
+  <!-- 비즈니스 로그: controller/service 중심 business.log (일자별 롤링) -->
+  <appender name="BIZ_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${LOG_PATH}/business.log</file>
+    <encoder>
+      <pattern>${PATTERN}</pattern>
+    </encoder>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>${LOG_PATH}/business.%d{yyyy-MM-dd}.log</fileNamePattern>
+      <maxHistory>7</maxHistory>
+      <totalSizeCap>512MB</totalSizeCap>
+    </rollingPolicy>
+  </appender>
+
+  <!-- 패키지별 로거: 비즈니스 로직은 business.log에도 기록 -->
+  <logger name="com.example.hanaro.controller" level="INFO" additivity="false">
+    <appender-ref ref="CONSOLE"/>
+    <appender-ref ref="APP_FILE"/>
+    <appender-ref ref="BIZ_FILE"/>
+  </logger>
+
+  <logger name="com.example.hanaro.service" level="INFO" additivity="false">
+    <appender-ref ref="CONSOLE"/>
+    <appender-ref ref="APP_FILE"/>
+    <appender-ref ref="BIZ_FILE"/>
+  </logger>
+
+  <!-- 프레임워크 로그는 너무 시끄럽지 않게 -->
+  <logger name="org.springframework" level="WARN"/>
+  <logger name="org.hibernate" level="WARN"/>
+
+  <!-- 루트 로거(기본): 콘솔 + app.log -->
+  <root level="INFO">
+    <appender-ref ref="CONSOLE"/>
+    <appender-ref ref="APP_FILE"/>
+  </root>
+</configuration>

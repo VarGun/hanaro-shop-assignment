@@ -139,5 +139,16 @@ public class ProductService {
     }
     return fileStorageService.getAbsoluteUrl(relativePath);
   }
+
+  @Transactional
+  public void changeStock(Long productId, int delta) {
+    Product p = productRepository.findById(productId)
+        .orElseThrow(() -> new NoSuchElementException("상품이 없습니다."));
+    int next = p.getStockQuantity() + delta;
+    if (next < 0) {
+      throw new IllegalStateException("재고가 음수가 될 수 없습니다.");
+    }
+    p.setStockQuantity(next);
+  }
 }
 

@@ -157,6 +157,44 @@ public class OrderService {
   }
 
   /**
+   * 관리자: 상태 변경 (CANCELED 전환 시 재고 롤백 포함)
+   */
+  @Transactional
+  public void changeStatusByAdmin(Long orderId, OrderStatus target) {
+    Order order = orderRepository.findById(orderId)
+        .orElseThrow(() -> new NoSuchElementException("주문을 찾을 수 없습니다."));
+
+    OrderStatus current = order.getStatus();
+
+    // 완료된 주문은 더 이상 변경 불가(정책)
+    if (current == OrderStatus.COMPLETED) {
+      throw new IllegalStateException("배송완료 주문은 상태를 변경할 수 없습니다.");
+    }
+
+    if (!isValidTransition(current, target)) {
+      throw new IllegalStateException("해당 상태로 변경할 수 없습니다. (" + current + " → " + target + ")");
+    }
+
+    // 관리자에 의해 CANCELED로 전환될 때 재고 롤백 보장
+    if (target == OrderStatus.CANCELED && current != OrderStatus.CANCELED) {
+      if (order.getOrderItems() != null) {
+        for (OrderItem oi : order.getOrderItems()) {
+          if (oi == null) {
+            continue;
+          }
+          Product p = oi.getProduct();
+          if (p != null) {
+            p.increaseStock(oi.getQuantity());
+            productRepository.save(p);
+          }
+        }
+      }
+    }
+
+    order.changeStatus(target);
+  }
+
+  /**
    * 사용자: 주문 취소 (본인만, 허용 상태에서만) - 예: ORDERED/SHIPPING까지만 취소 허용 - 재고 복원
    */
   @Transactional
