@@ -3,24 +3,32 @@ package com.example.hanaro.service;
 import com.example.hanaro.dto.OrderResponse;
 import com.example.hanaro.entity.Cart;
 import com.example.hanaro.entity.CartItem;
+import com.example.hanaro.entity.DailyProductStat;
+import com.example.hanaro.entity.DailySalesStat;
 import com.example.hanaro.entity.Order;
 import com.example.hanaro.entity.OrderItem;
 import com.example.hanaro.entity.OrderStatus;
 import com.example.hanaro.entity.Product;
 import com.example.hanaro.repository.CartRepository;
+import com.example.hanaro.repository.DailyProductStatRepository;
+import com.example.hanaro.repository.DailySalesStatRepository;
 import com.example.hanaro.repository.OrderRepository;
 import com.example.hanaro.repository.ProductRepository;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class OrderService {
@@ -28,6 +36,8 @@ public class OrderService {
   private final OrderRepository orderRepository;
   private final CartRepository cartRepository;
   private final ProductRepository productRepository;
+  private final DailySalesStatRepository dailySalesStatRepository;
+  private final DailyProductStatRepository dailyProductStatRepository;
 
   /**
    * 장바구니 → 주문 생성 - 장바구니 존재/비어있음/재고 검증 - 주문 아이템 생성 및 총액 계산 - 재고 차감 - 장바구니 비우기
@@ -204,5 +214,61 @@ public class OrderService {
   public Page<OrderResponse> listByUser(Long userId, Pageable pageable) {
     return orderRepository.findByUser_Id(userId, pageable)
         .map(OrderResponse::from);
+  }
+
+  //  @Scheduled(cron = "0 */5 * * * *") // 5분마다
+  @Scheduled(cron = "*/15 * * * * *") // [LOCAL TEST] 15초마다 (ORDERED → SHIPPING)
+  @Transactional
+  public void moveOrderedToShipping() {
+    int updated = orderRepository.bulkUpdateStatus(OrderStatus.ORDERED, OrderStatus.SHIPPING);
+    log.info("[SCHED] ORDERED→SHIPPING updated={}", updated);
+  }
+
+  //  @Scheduled(cron = "0 0 * * * *") // 1시간마다
+  @Scheduled(cron = "*/30 * * * * *") // [LOCAL TEST] 30초마다 (SHIPPING → COMPLETED)
+  @Transactional
+  public void moveShippingToCompleted() {
+    int updated = orderRepository.bulkUpdateStatus(OrderStatus.SHIPPING, OrderStatus.COMPLETED);
+    log.info("[SCHED] SHIPPING→COMPLETED updated={}", updated);
+  }
+
+  // 테스트용 (30초마다)
+  @Scheduled(cron = "*/30 * * * * *") // [TEST] 30초마다
+  //  @Scheduled(cron = "0 5 0 * * *") // 매일 00:05, 전일 통계 집계
+  @Transactional
+  public void collectDailyStats() {
+//    LocalDate target = LocalDate.now().minusDays(1); // 전일
+//    LocalDateTime from = target.atStartOfDay();
+//    LocalDateTime to = target.plusDays(1).atStartOfDay(); // 반개방 구간 [from, to)
+
+    // [테스트 전용] 오늘로 전환
+    LocalDate target = LocalDate.now();
+    LocalDateTime from = target.atStartOfDay();
+    LocalDateTime to = target.plusDays(1).atStartOfDay();
+
+    long orderCount = orderRepository.countByStatusAndDateBetween(OrderStatus.COMPLETED, from, to);
+    Long totalAmount = orderRepository.sumTotalPriceByStatusAndDateBetween(OrderStatus.COMPLETED,
+        from, to);
+    if (totalAmount == null) {
+      totalAmount = 0L;
+    }
+
+    // 집계 저장(일자 총계)
+    dailySalesStatRepository.save(new DailySalesStat(target, orderCount, totalAmount));
+
+    // 상품별 집계 저장
+    java.util.List<Object[]> rows = orderRepository.productStatsByDate(OrderStatus.COMPLETED, from,
+        to);
+    int saved = 0;
+    for (Object[] r : rows) {
+      Long productId = (Long) r[0];
+      long qty = ((Number) r[1]).longValue();
+      long amt = ((Number) r[2]).longValue();
+      dailyProductStatRepository.save(new DailyProductStat(target, productId, qty, amt));
+      saved++;
+    }
+
+    log.info("[BATCH][DAILY] date={}, orders={}, totalAmount={}, productRows={}", target,
+        orderCount, totalAmount, saved);
   }
 }

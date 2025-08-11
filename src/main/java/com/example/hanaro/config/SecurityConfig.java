@@ -40,20 +40,37 @@ public class SecurityConfig {
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     http
-        .csrf(csrf -> csrf.disable())
+        .csrf(csrf -> csrf
+            .disable()
+        )
         .headers(h -> h.frameOptions(f -> f.disable())) // H2 콘솔
         .authenticationProvider(authenticationProvider())
         .authorizeHttpRequests(auth -> auth
-            // 공개
-            .requestMatchers("/api/auth/login", "/api/auth/signup", "/api/auth/signup-admin")
-            .permitAll()
-            .requestMatchers("/h2-console/**", "/uploads/**").permitAll()
+            // Swagger & OpenAPI (public)
+            .requestMatchers(
+                "/v3/**",
+                "/v3/api-docs",
+                "/v3/api-docs/**",
+                "/swagger-ui.html",
+                "/swagger-ui/**",
+                "/swagger-resources/**",
+                "/webjars/**"
+            ).permitAll()
+
+            // Public
+            .requestMatchers(
+                "/api/auth/login",
+                "/api/auth/signup",
+                "/api/auth/signup-admin",
+                "/h2-console/**",
+                "/uploads/**"
+            ).permitAll()
             .requestMatchers(HttpMethod.GET, "/api/products", "/api/products/**").permitAll()
 
-            // 관리자 전용
+            // Admin only
             .requestMatchers("/api/admin/**").hasRole("ADMIN")
 
-            // 나머지는 로그인 필요 (예: /api/auth/me, 장바구니/주문 등)
+            // Others require auth
             .anyRequest().authenticated()
         )
         .formLogin(f -> f.disable())

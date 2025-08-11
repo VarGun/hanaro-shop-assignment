@@ -4,9 +4,11 @@ import com.example.hanaro.entity.Product;
 import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 @Builder
+@Setter
 public class ProductResponse {
 
   private Long id;

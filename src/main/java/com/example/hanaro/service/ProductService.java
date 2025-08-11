@@ -38,13 +38,23 @@ public class ProductService {
         .imageUrl(imageUrl)
         .build());
 
-    return ProductResponse.from(saved);
+    ProductResponse response = ProductResponse.from(saved);
+    if (response.getImageUrl() != null) {
+      response.setImageUrl(toAbsoluteUrl(response.getImageUrl()));
+    }
+    return response;
   }
 
   @Transactional(readOnly = true)
   public ProductResponse get(Long id) {
     return productRepository.findById(id)
-        .map(ProductResponse::from)
+        .map(p -> {
+          ProductResponse resp = ProductResponse.from(p);
+          if (resp.getImageUrl() != null) {
+            resp.setImageUrl(toAbsoluteUrl(resp.getImageUrl()));
+          }
+          return resp;
+        })
         .orElseThrow(() -> new NoSuchElementException("상품을 찾을 수 없습니다."));
   }
 
@@ -66,7 +76,11 @@ public class ProductService {
 
     p.changeInfo(req.getName(), req.getDescription(), req.getPrice(), req.getStockQuantity());
 
-    return ProductResponse.from(p);
+    ProductResponse response = ProductResponse.from(p);
+    if (response.getImageUrl() != null) {
+      response.setImageUrl(toAbsoluteUrl(response.getImageUrl()));
+    }
+    return response;
   }
 
   public void delete(Long id) {
@@ -85,7 +99,15 @@ public class ProductService {
         minPrice,
         maxPrice
     );
-    return products.stream().map(ProductResponse::from).toList();
+    return products.stream()
+        .map(p -> {
+          ProductResponse resp = ProductResponse.from(p);
+          if (resp.getImageUrl() != null) {
+            resp.setImageUrl(toAbsoluteUrl(resp.getImageUrl()));
+          }
+          return resp;
+        })
+        .toList();
   }
 
   @Transactional(readOnly = true)
@@ -94,7 +116,15 @@ public class ProductService {
     List<Product> products = hasQuery
         ? productRepository.findByNameContainingIgnoreCase(q.trim())
         : productRepository.findAll();
-    return products.stream().map(ProductResponse::from).toList();
+    return products.stream()
+        .map(p -> {
+          ProductResponse resp = ProductResponse.from(p);
+          if (resp.getImageUrl() != null) {
+            resp.setImageUrl(toAbsoluteUrl(resp.getImageUrl()));
+          }
+          return resp;
+        })
+        .toList();
   }
 
   @Transactional(readOnly = true)
@@ -102,4 +132,12 @@ public class ProductService {
     return productRepository.findById(id)
         .orElseThrow(() -> new EntityNotFoundException("상품을 찾을 수 없습니다. id=" + id));
   }
+
+  private String toAbsoluteUrl(String relativePath) {
+    if (relativePath == null) {
+      return null;
+    }
+    return fileStorageService.getAbsoluteUrl(relativePath);
+  }
 }
+

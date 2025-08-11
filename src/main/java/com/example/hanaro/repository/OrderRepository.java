@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -54,7 +55,31 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
    * 특정 사용자의 주문 목록 (페이징 없이)
    */
   List<Order> findByUser_Id(Long userId);
-  
+
   @EntityGraph(attributePaths = {"orderItems", "orderItems.product"})
   Page<Order> findByUser_Id(Long userId, Pageable pageable);
+
+  @Modifying(clearAutomatically = true, flushAutomatically = true)
+  @Query("update Order o set o.status = :to where o.status = :from")
+  int bulkUpdateStatus(@Param("from") OrderStatus from, @Param("to") OrderStatus to);
+
+  @Query("select count(o) from Order o where o.status = :status and o.orderDate >= :from and o.orderDate < :to")
+  long countByStatusAndDateBetween(@Param("status") OrderStatus status,
+      @Param("from") LocalDateTime from,
+      @Param("to") LocalDateTime to);
+
+  @Query("select coalesce(sum(o.totalPrice), 0) from Order o where o.status = :status and o.orderDate >= :from and o.orderDate < :to")
+  Long sumTotalPriceByStatusAndDateBetween(@Param("status") OrderStatus status,
+      @Param("from") LocalDateTime from,
+      @Param("to") LocalDateTime to);
+
+  @Query("select oi.product.id, sum(oi.quantity), sum(oi.price * oi.quantity) " +
+      "from OrderItem oi " +
+      "where oi.order.status = :status and oi.order.orderDate >= :from and oi.order.orderDate < :to "
+      +
+      "group by oi.product.id " +
+      "order by sum(oi.quantity) desc")
+  List<Object[]> productStatsByDate(@Param("status") OrderStatus status,
+      @Param("from") LocalDateTime from,
+      @Param("to") LocalDateTime to);
 }
