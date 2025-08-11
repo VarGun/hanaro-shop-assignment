@@ -13,8 +13,7 @@ public interface DailyProductStatRepository extends
     JpaRepository<DailyProductStat, DailyProductStatId> {
 
   @Query("select d from DailyProductStat d where d.id.statDate between :from and :to order by d.id.statDate asc")
-  List<DailyProductStat> findByStatDateBetweenOrderByStatDateAsc(@Param("from") LocalDate from,
-      @Param("to") LocalDate to);
+  List<DailyProductStat> findByIdStatDateBetweenOrderByIdStatDateAsc(LocalDate from, LocalDate to);
 
   @Modifying(clearAutomatically = true, flushAutomatically = true)
   @Query("delete from DailyProductStat d where d.id.statDate = :date")

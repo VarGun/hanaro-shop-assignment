@@ -23,16 +23,28 @@ public class AdminStatController {
   private final DailyProductStatRepository dailyProductStatRepository;
 
   @GetMapping("/sales")
-  public List<SalesStatDto> sales(@RequestParam LocalDate from, @RequestParam LocalDate to) {
+  public List<SalesStatDto> sales(
+      @RequestParam(required = false) LocalDate from,
+      @RequestParam(required = false) LocalDate to) {
+
+    LocalDate start = (from != null) ? from : LocalDate.now().minusDays(7);
+    LocalDate end = (to != null) ? to : LocalDate.now();
+    
     return dailySalesStatRepository
-        .findByStatDateBetweenOrderByStatDateAsc(from, to)
+        .findByStatDateBetweenOrderByStatDateAsc(start, end)
         .stream().map(SalesStatDto::from).toList();
   }
 
   @GetMapping("/products")
-  public List<ProductStatDto> products(@RequestParam LocalDate from, @RequestParam LocalDate to) {
+  public List<ProductStatDto> products(
+      @RequestParam(required = false) LocalDate from,
+      @RequestParam(required = false) LocalDate to) {
+
+    LocalDate start = (from != null) ? from : LocalDate.now().minusDays(7);
+    LocalDate end = (to != null) ? to : LocalDate.now();
+
     return dailyProductStatRepository
-        .findByStatDateBetweenOrderByStatDateAsc(from, to)
+        .findByIdStatDateBetweenOrderByIdStatDateAsc(start, end)
         .stream().map(ProductStatDto::from).toList();
   }
 

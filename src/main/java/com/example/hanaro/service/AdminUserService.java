@@ -16,7 +16,6 @@ public class AdminUserService {
 
   @Transactional
   public void delete(Long userId) {
-    // 하드 삭제(요구사항 충족 최소안). 소프트 삭제 필요 시 flag 추가.
     User u = userRepository.findById(userId)
         .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
     userRepository.delete(u);

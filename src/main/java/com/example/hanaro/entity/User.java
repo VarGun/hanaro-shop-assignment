@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "users")
@@ -16,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 @Builder
 @RequiredArgsConstructor
 @AllArgsConstructor
+@Setter
 public class User extends BaseEntity {
 
   @Id
@@ -30,7 +32,7 @@ public class User extends BaseEntity {
 
   private String name;
   private String phone;
-  
+
   private Role role = Role.USER; // 기본값
 
 }

@@ -2,3 +2,6 @@
 2025-08-11 22:04:09.424 [http-nio-8080-exec-10] INFO  business.order - [CREATE] orderId=1, userId=1, totalPrice=36000
 2025-08-11 22:18:43.133 [http-nio-8080-exec-8] INFO  business.order - [CREATE] orderId=1, userId=1, totalPrice=36000
 2025-08-11 22:19:42.568 [http-nio-8080-exec-2] INFO  business.order - [CREATE] orderId=2, userId=2, totalPrice=144000
+2025-08-11 23:10:51.747 [http-nio-8080-exec-9] INFO  business.order - [CREATE] orderId=1, userId=1, totalPrice=36000
+2025-08-11 23:15:31.810 [http-nio-8080-exec-2] INFO  business.order - [CREATE] orderId=1, userId=1, totalPrice=36000
+2025-08-11 23:16:24.519 [http-nio-8080-exec-10] INFO  business.order - [CREATE] orderId=2, userId=1, totalPrice=144000
