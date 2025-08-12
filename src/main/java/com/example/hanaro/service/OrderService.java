@@ -260,7 +260,8 @@ public class OrderService {
   }
 
   //  @Scheduled(fixedRate = 300000)
-  @Scheduled(fixedRate = 5_000)
+//  @Scheduled(fixedRate = 5_000)
+  @Scheduled(cron = "0 5 * * * *")
   @Transactional
   public void moveOrderedToReady() {
     LocalDateTime threshold = LocalDateTime.now().minusMinutes(5); // 5분 체류 보장 (운영)
@@ -269,8 +270,9 @@ public class OrderService {
     log.info("[SCHED] ORDERED -> READY updated={}", updated);
   }
 
-  @Scheduled(fixedRate = 900000)
-//  @Scheduled(fixedRate = 5_000) // 테스트
+  //  @Scheduled(fixedRate = 900000)
+  @Scheduled(fixedRate = 5_000)
+//  @Scheduled(cron = "0 15 * * * *")
   @Transactional
   public void moveReadyToShipping() {
     LocalDateTime threshold = LocalDateTime.now().minusMinutes(15); // 15분 체류 보장 (운영)
@@ -279,8 +281,9 @@ public class OrderService {
     log.info("[SCHED] READY -> SHIPPING updated={}", updated);
   }
 
-  @Scheduled(fixedRate = 3600000)
+  //  @Scheduled(fixedRate = 3600000)
 //  @Scheduled(fixedRate = 10_000) // 테스트
+  @Scheduled(cron = "0 0 * * * *")
   @Transactional
   public void moveShippingToCompleted() {
     LocalDateTime threshold = LocalDateTime.now().minusHours(1); // 1시간 체류 보장 (운영)

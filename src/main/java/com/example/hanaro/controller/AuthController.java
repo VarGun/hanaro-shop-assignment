@@ -56,6 +56,17 @@ public class AuthController {
     return ResponseEntity.ok(new TokenResponse(token, "Bearer"));
   }
 
+  @PostMapping("/admin/login")
+  public ResponseEntity<TokenResponse> adminLogin(@Valid @RequestBody LoginRequest req) {
+    String adminEmail = req.getEmail() + "@hanaro.com";
+
+    Authentication auth = authenticationManager.authenticate(
+        new UsernamePasswordAuthenticationToken(adminEmail, req.getPassword()));
+
+    String token = jwtTokenProvider.createToken((UserDetails) auth.getPrincipal());
+    return ResponseEntity.ok(new TokenResponse(token, "Bearer"));
+  }
+
   @PostMapping("/logout")
   public ResponseEntity<Void> logout(HttpServletRequest request,
       HttpServletResponse response) {

@@ -67,7 +67,7 @@ public class FileStorageService {
       Files.copy(originPath, uploadPath, StandardCopyOption.REPLACE_EXISTING);
 
       // 6) 브라우저 접근용 URL 반환
-      return "/resources/static/upload/" + yyyy + "/" + MM + "/" + dd + "/" + filename;
+      return "/upload/" + yyyy + "/" + MM + "/" + dd + "/" + filename;
 
     } catch (IOException e) {
       throw new IllegalStateException("파일 저장에 실패했습니다.");

@@ -71,13 +71,16 @@ public class SecurityConfig {
 
             // Public
             .requestMatchers(
+                "/api/auth/admin/login",
                 "/api/auth/login",
                 "/api/auth/signup",
                 "/api/auth/signup-admin",
                 "/h2-console/**",
                 "/uploads/**",
                 "/resources/**",
-                "/static/**"
+                "/static/**",
+                "/origin/**",
+                "/upload/**"
             ).permitAll()
             .requestMatchers(HttpMethod.GET, "/api/products", "/api/products/**").permitAll()
 

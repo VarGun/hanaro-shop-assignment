@@ -44,3 +44,25 @@
 2025-08-12 11:33:33.691 [http-nio-8080-exec-4] INFO  business.product - [STOCK][USER-CANCEL][INCREASE] productId=2, name='Product22', before=14, delta=+6, after=20, orderId=1, userId=2
 2025-08-12 11:33:47.817 [http-nio-8080-exec-6] INFO  business.product - [PRODUCT][DELETE][REQ] id=1
 2025-08-12 11:33:47.836 [http-nio-8080-exec-6] INFO  business.product - [PRODUCT][DELETE][RES] id=1 done
+2025-08-12 12:50:25.396 [http-nio-8080-exec-5] INFO  business.product - [PRODUCT][CREATE][REQ] name='name1', price=123213, stock=12, hasImage=true
+2025-08-12 12:50:25.406 [http-nio-8080-exec-5] INFO  business.product - [PRODUCT][IMAGE][SAVE] name='name1' -> /resources/static/upload/2025/08/12/d5c005f5-344e-4b49-a0fc-27639d2e5d9f.jpg
+2025-08-12 12:50:25.442 [http-nio-8080-exec-5] INFO  business.product - [PRODUCT][CREATE][RES] id=3, name='name1', price=123213, stock=12, imageUrl=/resources/static/upload/2025/08/12/d5c005f5-344e-4b49-a0fc-27639d2e5d9f.jpg
+2025-08-12 12:50:32.399 [http-nio-8080-exec-6] INFO  business.product - [PRODUCT][DELETE][REQ] id=3
+2025-08-12 12:50:32.423 [http-nio-8080-exec-6] INFO  business.product - [PRODUCT][IMAGE][DELETE] id=3, url=/resources/static/upload/2025/08/12/d5c005f5-344e-4b49-a0fc-27639d2e5d9f.jpg
+2025-08-12 12:50:32.426 [http-nio-8080-exec-6] INFO  business.product - [PRODUCT][DELETE][RES] id=3 done
+2025-08-12 14:07:45.160 [http-nio-8080-exec-5] INFO  business.product - [PRODUCT][CREATE][REQ] name='name1', price=123213, stock=12, hasImage=true
+2025-08-12 14:07:45.167 [http-nio-8080-exec-5] INFO  business.product - [PRODUCT][IMAGE][SAVE] name='name1' -> /resources/static/upload/2025/08/12/7376f57c-1e76-4036-94bb-fa16a03c24d5.jpg
+2025-08-12 14:07:45.189 [http-nio-8080-exec-5] INFO  business.product - [PRODUCT][CREATE][RES] id=4, name='name1', price=123213, stock=12, imageUrl=/resources/static/upload/2025/08/12/7376f57c-1e76-4036-94bb-fa16a03c24d5.jpg
+2025-08-12 14:12:27.471 [http-nio-8080-exec-4] INFO  business.product - [PRODUCT][CREATE][REQ] name='name1', price=123213, stock=12, hasImage=true
+2025-08-12 14:12:27.478 [http-nio-8080-exec-4] INFO  business.product - [PRODUCT][IMAGE][SAVE] name='name1' -> /upload/2025/08/12/12733ea4-3d6b-4dd1-9bf3-c24e80624a85.jpg
+2025-08-12 14:12:27.502 [http-nio-8080-exec-4] INFO  business.product - [PRODUCT][CREATE][RES] id=4, name='name1', price=123213, stock=12, imageUrl=/upload/2025/08/12/12733ea4-3d6b-4dd1-9bf3-c24e80624a85.jpg
+2025-08-12 14:15:46.987 [http-nio-8080-exec-2] INFO  business.product - [PRODUCT][CREATE][REQ] name='name1', price=123213, stock=12, hasImage=true
+2025-08-12 14:15:46.994 [http-nio-8080-exec-2] INFO  business.product - [PRODUCT][IMAGE][SAVE] name='name1' -> /upload/2025/08/12/2e5d133c-52bc-4717-8af7-859182c8b432.jpg
+2025-08-12 14:15:47.017 [http-nio-8080-exec-2] INFO  business.product - [PRODUCT][CREATE][RES] id=4, name='name1', price=123213, stock=12, imageUrl=/upload/2025/08/12/2e5d133c-52bc-4717-8af7-859182c8b432.jpg
+2025-08-12 14:16:37.515 [http-nio-8080-exec-3] INFO  business.product - [PRODUCT][CREATE][REQ] name='name1', price=213213, stock=123, hasImage=true
+2025-08-12 14:16:41.673 [http-nio-8080-exec-4] INFO  business.product - [PRODUCT][CREATE][REQ] name='name122', price=213213, stock=123, hasImage=true
+2025-08-12 14:16:41.679 [http-nio-8080-exec-4] INFO  business.product - [PRODUCT][IMAGE][SAVE] name='name122' -> /upload/2025/08/12/776ea525-8f7d-4495-a019-f2c13a0db941.jpg
+2025-08-12 14:16:41.684 [http-nio-8080-exec-4] INFO  business.product - [PRODUCT][CREATE][RES] id=5, name='name122', price=213213, stock=123, imageUrl=/upload/2025/08/12/776ea525-8f7d-4495-a019-f2c13a0db941.jpg
+2025-08-12 14:23:55.480 [http-nio-8080-exec-5] INFO  business.product - [PRODUCT][CREATE][REQ] name='name122', price=213213, stock=123, hasImage=true
+2025-08-12 14:23:55.486 [http-nio-8080-exec-5] INFO  business.product - [PRODUCT][IMAGE][SAVE] name='name122' -> /upload/2025/08/12/54ecd51b-6bbd-4cb2-96a0-c704bb186aba.jpg
+2025-08-12 14:23:55.509 [http-nio-8080-exec-5] INFO  business.product - [PRODUCT][CREATE][RES] id=4, name='name122', price=213213, stock=123, imageUrl=/upload/2025/08/12/54ecd51b-6bbd-4cb2-96a0-c704bb186aba.jpg
