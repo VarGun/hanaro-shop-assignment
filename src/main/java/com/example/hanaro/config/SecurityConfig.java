@@ -84,10 +84,8 @@ public class SecurityConfig {
             ).permitAll()
             .requestMatchers(HttpMethod.GET, "/api/products", "/api/products/**").permitAll()
 
-            // Admin only
             .requestMatchers("/api/admin/**").hasRole("ADMIN")
 
-            // Others require auth
             .anyRequest().authenticated()
         )
         .formLogin(f -> f.disable())

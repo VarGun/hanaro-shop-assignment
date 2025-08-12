@@ -131,68 +131,6 @@ public class OrderService {
   }
 
   /**
-   * 관리자: 상태 변경 - 유효 전이만 허용(예시 정책)
-   */
-  @Transactional
-  public void changeStatus(Long orderId, OrderStatus target) {
-    Order order = orderRepository.findById(orderId)
-        .orElseThrow(() -> new NoSuchElementException("주문을 찾을 수 없습니다."));
-
-    OrderStatus current = order.getStatus();
-    if (!isValidTransition(current, target)) {
-      throw new IllegalStateException("해당 상태로 변경할 수 없습니다. (" + current + " -> " + target + ")");
-    }
-
-    order.changeStatus(target);
-    bizOrderLog.info("[STATUS][MANUAL] orderId={}, {} -> {}", orderId, current, target);
-  }
-
-  /**
-   * 관리자: 상태 변경 (CANCELED 전환 시 재고 롤백 포함)
-   */
-  @Transactional
-  public void changeStatusByAdmin(Long orderId, OrderStatus target) {
-    Order order = orderRepository.findById(orderId)
-        .orElseThrow(() -> new NoSuchElementException("주문을 찾을 수 없습니다."));
-
-    OrderStatus current = order.getStatus();
-
-    // 완료된 주문은 더 이상 변경 불가(정책)
-    if (current == OrderStatus.COMPLETED) {
-      throw new IllegalStateException("배송완료 주문은 상태를 변경할 수 없습니다.");
-    }
-
-    if (!isValidTransition(current, target)) {
-      throw new IllegalStateException("해당 상태로 변경할 수 없습니다. (" + current + " -> " + target + ")");
-    }
-
-    // 관리자에 의해 CANCELED로 전환될 때 재고 롤백 보장
-    if (target == OrderStatus.CANCELED && current != OrderStatus.CANCELED) {
-      if (order.getOrderItems() != null) {
-        for (OrderItem oi : order.getOrderItems()) {
-          if (oi == null) {
-            continue;
-          }
-          Product p = oi.getProduct();
-          if (p != null) {
-            int before = p.getStockQuantity();
-            p.increaseStock(oi.getQuantity());
-            int after = p.getStockQuantity();
-            productRepository.save(p);
-
-            bizProductLog.info(
-                "[STOCK][ADMIN-CANCEL][INCREASE] productId={}, name='{}', before={}, delta=+{}, after={}, orderId={}",
-                p.getId(), p.getName(), before, oi.getQuantity(), after, order.getId());
-          }
-        }
-      }
-    }
-
-    order.changeStatus(target);
-    bizOrderLog.info("[STATUS][ADMIN] orderId={}, {} -> {}", orderId, current, target);
-  }
-
-  /**
    * 사용자: 주문 취소 (본인만, 허용 상태에서만) - 예: ORDERED/READY/SHIPPING까지만 취소 허용 - 재고 복원
    */
   @Transactional
@@ -259,8 +197,6 @@ public class OrderService {
         .map(OrderResponse::from);
   }
 
-  //  @Scheduled(fixedRate = 300000)
-//  @Scheduled(fixedRate = 5_000)
   @Scheduled(cron = "0 5 * * * *")
   @Transactional
   public void moveOrderedToReady() {
@@ -270,9 +206,7 @@ public class OrderService {
     log.info("[SCHED] ORDERED -> READY updated={}", updated);
   }
 
-  //  @Scheduled(fixedRate = 900000)
-  @Scheduled(fixedRate = 5_000)
-//  @Scheduled(cron = "0 15 * * * *")
+  @Scheduled(cron = "0 15 * * * *")
   @Transactional
   public void moveReadyToShipping() {
     LocalDateTime threshold = LocalDateTime.now().minusMinutes(15); // 15분 체류 보장 (운영)
@@ -281,8 +215,6 @@ public class OrderService {
     log.info("[SCHED] READY -> SHIPPING updated={}", updated);
   }
 
-  //  @Scheduled(fixedRate = 3600000)
-//  @Scheduled(fixedRate = 10_000) // 테스트
   @Scheduled(cron = "0 0 * * * *")
   @Transactional
   public void moveShippingToCompleted() {
@@ -296,11 +228,9 @@ public class OrderService {
   @Transactional
   public void collectDailyStats() {
     LocalDate target = LocalDate.now().minusDays(1); // 전일
-//    LocalDate target = LocalDate.now(); // 테스트
     LocalDateTime from = target.atStartOfDay();
     LocalDateTime to = target.plusDays(1).atStartOfDay();
 
-    // 재집계 대비: 해당 일자 통계 삭제 후 재생성 (idempotent)
     dailyProductStatRepository.deleteByDate(target);
     dailySalesStatRepository.deleteByDate(target);
 
@@ -311,10 +241,8 @@ public class OrderService {
       totalAmount = 0L;
     }
 
-    // 집계 저장(일자 총계)
     dailySalesStatRepository.save(new DailySalesStat(target, orderCount, totalAmount));
 
-    // 상품별 집계 저장
     java.util.List<Object[]> rows = orderRepository.productStatsByDate(OrderStatus.COMPLETED, from,
         to);
     int saved = 0;

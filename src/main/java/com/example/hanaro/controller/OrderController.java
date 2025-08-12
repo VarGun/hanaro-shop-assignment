@@ -26,9 +26,7 @@ public class OrderController {
 
   private final OrderService orderService;
 
-  /**
-   * 장바구니를 주문으로 생성
-   */
+  // 장바구니를 주문으로 생성
   @PostMapping("/api/orders")
   public ResponseEntity<OrderResponse> createFromCart(
       @AuthenticationPrincipal CustomUserDetails user) {
@@ -36,9 +34,7 @@ public class OrderController {
     return ResponseEntity.status(HttpStatus.CREATED).body(resp);
   }
 
-  /**
-   * 주문 단건 조회 (본인 주문만 조회 가능)
-   */
+  // 주문 단건 조회 (본인 주문만 조회 가능)
   @GetMapping("/api/orders/{orderId}")
   public OrderResponse get(@PathVariable Long orderId,
       @AuthenticationPrincipal CustomUserDetails user) {

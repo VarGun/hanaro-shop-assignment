@@ -21,10 +21,10 @@ INSERT INTO products (name, description, price, stock_quantity, image_url, creat
 VALUES ('MacBook Pro', 'MacBook Pro description', 2000000, 50, '/origin/image1.jpg', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 INSERT INTO products (name, description, price, stock_quantity, image_url, created_at, updated_at)
-VALUES ('iPad Pro', 'iPad Pro description', 1200000, 100, NULL, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+VALUES ('iPad Pro', 'iPad Pro description', 1200000, 100, '/origin/image2.jpeg', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 INSERT INTO products (name, description, price, stock_quantity, image_url, created_at, updated_at)
-VALUES ('Apple Watch', 'Apple Watch description', 500000, 200, NULL, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+VALUES ('Apple Watch', 'Apple Watch description', 500000, 200, '/origin/image3.jpeg', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 ---
 -- CARTS

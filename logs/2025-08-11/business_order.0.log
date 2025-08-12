@@ -5,3 +5,4 @@
 2025-08-11 23:10:51.747 [http-nio-8080-exec-9] INFO  business.order - [CREATE] orderId=1, userId=1, totalPrice=36000
 2025-08-11 23:15:31.810 [http-nio-8080-exec-2] INFO  business.order - [CREATE] orderId=1, userId=1, totalPrice=36000
 2025-08-11 23:16:24.519 [http-nio-8080-exec-10] INFO  business.order - [CREATE] orderId=2, userId=1, totalPrice=144000
+2025-08-12 00:00:00.004 [scheduler-1] INFO com.example.hanaro.service.OrderService - [BATCH][DAILY] date=2025-08-12, orders=3, totalAmount=142000, productRows=2

@@ -48,7 +48,7 @@ CREATE TABLE orders (
                         id BIGINT AUTO_INCREMENT PRIMARY KEY,
                         user_id BIGINT NOT NULL,
                         order_date DATETIME,
-                        status VARCHAR(20),
+                        status ENUM('ORDERED', 'READY', 'SHIPPING', 'COMPLETED', 'CANCELED'),
                         total_price INT,
                         status_changed_at DATETIME NOT NULL,
                         updated_at DATETIME NOT NULL,

@@ -29,7 +29,7 @@ public class AdminStatController {
 
     LocalDate start = (from != null) ? from : LocalDate.now().minusDays(7);
     LocalDate end = (to != null) ? to : LocalDate.now();
-    
+
     return dailySalesStatRepository
         .findByStatDateBetweenOrderByStatDateAsc(start, end)
         .stream().map(SalesStatDto::from).toList();
@@ -48,7 +48,6 @@ public class AdminStatController {
         .stream().map(ProductStatDto::from).toList();
   }
 
-  // --- 내부 DTO ---
   public record SalesStatDto(LocalDate statDate, long orderCount, long totalAmount) {
 
     static SalesStatDto from(DailySalesStat s) {

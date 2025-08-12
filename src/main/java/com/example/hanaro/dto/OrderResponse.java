@@ -15,10 +15,7 @@ public record OrderResponse(
     int totalPrice,
     List<OrderLine> items
 ) {
-
-  public int getTotalPrice() {
-    return totalPrice;
-  }
+  
 
   @Builder
   public record OrderLine(Long productId, String name, int price, int quantity) {

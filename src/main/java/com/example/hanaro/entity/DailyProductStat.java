@@ -51,14 +51,6 @@ public class DailyProductStat extends BaseEntity {
     return id.productId;
   }
 
-  public void setQuantity(long v) {
-    this.quantity = v;
-  }
-
-  public void setAmount(long v) {
-    this.amount = v;
-  }
-
   @Embeddable
   public static class DailyProductStatId implements Serializable {
 

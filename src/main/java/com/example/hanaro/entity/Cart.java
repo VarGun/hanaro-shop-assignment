@@ -53,7 +53,6 @@ public class Cart extends BaseEntity {
       return;
     }
 
-    // 이미 담은 상품이면 수량 합산 (orphanRemoval 전략을 이용해 교체)
     CartItem existing = this.cartItems.stream()
         .filter(ci -> ci.getProduct() != null && ci.getProduct().getId().equals(product.getId()))
         .findFirst()
@@ -103,10 +102,6 @@ public class Cart extends BaseEntity {
           .build();
       this.cartItems.add(updated);
     }
-  }
-
-  public void clearItems() {
-    this.cartItems.clear();
   }
 
 }

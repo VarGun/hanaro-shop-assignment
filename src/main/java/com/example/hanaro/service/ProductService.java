@@ -30,8 +30,6 @@ public class ProductService {
   private final OrderItemRepository orderItemRepository;
 
   public ProductResponse create(ProductCreateRequest req) {
-    System.out.println(
-        "PRODUCT 호출 PRODUCT 호출 PRODUCT 호출 PRODUCT 호출 PRODUCT 호출 PRODUCT 호출 PRODUCT 호출 PRODUCT 호출 ");
     bizLog.info("[PRODUCT][CREATE][REQ] name='{}', price={}, stock={}, hasImage={}", req.getName(),
         req.getPrice(), req.getStockQuantity(),
         (req.getImage() != null && !req.getImage().isEmpty()));

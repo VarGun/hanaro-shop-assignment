@@ -66,3 +66,15 @@
 2025-08-12 14:23:55.480 [http-nio-8080-exec-5] INFO  business.product - [PRODUCT][CREATE][REQ] name='name122', price=213213, stock=123, hasImage=true
 2025-08-12 14:23:55.486 [http-nio-8080-exec-5] INFO  business.product - [PRODUCT][IMAGE][SAVE] name='name122' -> /upload/2025/08/12/54ecd51b-6bbd-4cb2-96a0-c704bb186aba.jpg
 2025-08-12 14:23:55.509 [http-nio-8080-exec-5] INFO  business.product - [PRODUCT][CREATE][RES] id=4, name='name122', price=213213, stock=123, imageUrl=/upload/2025/08/12/54ecd51b-6bbd-4cb2-96a0-c704bb186aba.jpg
+2025-08-12 16:12:19.086 [http-nio-8080-exec-4] INFO  business.product - [PRODUCT][UPDATE][REQ] id=1, name='수정', price=123, stock=1233, changeImage=true
+2025-08-12 16:12:19.106 [http-nio-8080-exec-4] INFO  business.product - [PRODUCT][IMAGE][DELETE] id=1, oldUrl=/origin/image1.jpg
+2025-08-12 16:12:19.109 [http-nio-8080-exec-4] INFO  business.product - [PRODUCT][IMAGE][SAVE] id=1, newUrl=/upload/2025/08/12/533c2268-511c-44dc-a99e-b4f9f7135dae.jpg
+2025-08-12 16:12:19.109 [http-nio-8080-exec-4] INFO  business.product - [PRODUCT][UPDATE][RES] id=1, name='수정', price=123, stock=1233, imageUrl=/upload/2025/08/12/533c2268-511c-44dc-a99e-b4f9f7135dae.jpg
+2025-08-12 16:35:49.134 [http-nio-8080-exec-3] INFO  business.product - [PRODUCT][CREATE][REQ] name='string', price=1073741824, stock=1073741824, hasImage=true
+2025-08-12 16:35:49.139 [http-nio-8080-exec-3] INFO  business.product - [PRODUCT][IMAGE][SAVE] name='string' -> /upload/2025/08/12/bb7affba-3147-4184-9c8a-cc06dd727ac4.jpg
+2025-08-12 16:35:49.161 [http-nio-8080-exec-3] INFO  business.product - [PRODUCT][CREATE][RES] id=4, name='string', price=1073741824, stock=1073741824, imageUrl=/upload/2025/08/12/bb7affba-3147-4184-9c8a-cc06dd727ac4.jpg
+2025-08-12 16:37:59.721 [http-nio-8080-exec-3] INFO  business.product - [STOCK][ORDER][DECREASE] productId=3, name='Apple Watch', before=200, delta=-2, after=198
+2025-08-12 16:37:59.722 [http-nio-8080-exec-3] INFO  business.product - [STOCK][ORDER][DECREASE] productId=1, name='MacBook Pro', before=50, delta=-2, after=48
+2025-08-12 16:37:59.723 [http-nio-8080-exec-3] INFO  business.product - [STOCK][ORDER][DECREASE] productId=2, name='iPad Pro', before=100, delta=-2, after=98
+2025-08-12 17:27:09.606 [http-nio-8080-exec-7] INFO  business.product - [STOCK][ORDER][DECREASE] productId=1, name='MacBook Pro', before=50, delta=-1, after=49
+2025-08-12 17:27:09.607 [http-nio-8080-exec-7] INFO  business.product - [STOCK][ORDER][DECREASE] productId=2, name='iPad Pro', before=100, delta=-3, after=97

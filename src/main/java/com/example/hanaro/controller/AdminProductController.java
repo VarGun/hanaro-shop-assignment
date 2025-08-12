@@ -92,7 +92,6 @@ public class AdminProductController {
 
   } // +면 증가, -면 감소
 
-  // 중복 최소화를 원하면 공용 유틸로 빼도 되지만, 우선 간단히 유지
   private ProductResponse withAbsoluteImageUrl(ProductResponse resp) {
     if (resp == null) {
       return null;

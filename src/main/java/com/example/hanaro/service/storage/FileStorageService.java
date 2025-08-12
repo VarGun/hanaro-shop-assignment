@@ -31,10 +31,7 @@ public class FileStorageService {
     if (file == null || file.isEmpty()) {
       return null;
     }
-    System.out.println("[FILE][SAVE] type=" + file.getContentType()
-        + ", size=" + file.getSize() + " bytes");
 
-    // 1) 타입/크기 검증
     String contentType = file.getContentType();
     if (contentType == null || !ALLOWED_TYPES.contains(contentType)) {
       throw new IllegalArgumentException("이미지 형식은 jpg 또는 png만 허용됩니다.");
