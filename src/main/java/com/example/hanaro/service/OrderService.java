@@ -234,7 +234,6 @@ public class OrderService {
     order.changeStatus(OrderStatus.CANCELED);
   }
 
-  // -----------
 
   private boolean isValidTransition(OrderStatus current, OrderStatus target) {
     if (current == target) {
@@ -260,7 +259,8 @@ public class OrderService {
         .map(OrderResponse::from);
   }
 
-  @Scheduled(fixedRate = 300000)
+  //  @Scheduled(fixedRate = 300000)
+  @Scheduled(fixedRate = 5_000)
   @Transactional
   public void moveOrderedToReady() {
     LocalDateTime threshold = LocalDateTime.now().minusMinutes(5); // 5분 체류 보장 (운영)
@@ -270,6 +270,7 @@ public class OrderService {
   }
 
   @Scheduled(fixedRate = 900000)
+//  @Scheduled(fixedRate = 5_000) // 테스트
   @Transactional
   public void moveReadyToShipping() {
     LocalDateTime threshold = LocalDateTime.now().minusMinutes(15); // 15분 체류 보장 (운영)
@@ -279,6 +280,7 @@ public class OrderService {
   }
 
   @Scheduled(fixedRate = 3600000)
+//  @Scheduled(fixedRate = 10_000) // 테스트
   @Transactional
   public void moveShippingToCompleted() {
     LocalDateTime threshold = LocalDateTime.now().minusHours(1); // 1시간 체류 보장 (운영)
@@ -287,13 +289,11 @@ public class OrderService {
     log.info("[SCHED] SHIPPING -> COMPLETED updated={}", updated);
   }
 
-  // 테스트용 (전일 통계 집계)
-//  @Scheduled(cron = "0 0 0 * * *") // 매일 00:00, 전일 통계 집계
-  @Scheduled(cron = "*/30 * * * * *")
+  @Scheduled(cron = "0 0 0 * * *") // 매일 00:00, 전일 통계 집계
   @Transactional
   public void collectDailyStats() {
-//    LocalDate target = LocalDate.now().minusDays(1); // 전일
-    LocalDate target = LocalDate.now();
+    LocalDate target = LocalDate.now().minusDays(1); // 전일
+//    LocalDate target = LocalDate.now(); // 테스트
     LocalDateTime from = target.atStartOfDay();
     LocalDateTime to = target.plusDays(1).atStartOfDay();
 

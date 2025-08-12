@@ -3,6 +3,8 @@ package com.example.hanaro.service;
 import com.example.hanaro.dto.ProductCreateRequest;
 import com.example.hanaro.dto.ProductResponse;
 import com.example.hanaro.entity.Product;
+import com.example.hanaro.repository.CartItemRepository;
+import com.example.hanaro.repository.OrderItemRepository;
 import com.example.hanaro.repository.ProductRepository;
 import com.example.hanaro.service.storage.FileStorageService;
 import jakarta.persistence.EntityNotFoundException;
@@ -23,6 +25,9 @@ public class ProductService {
 
   private final ProductRepository productRepository;
   private final FileStorageService fileStorageService;
+
+  private final CartItemRepository cartItemRepository;
+  private final OrderItemRepository orderItemRepository;
 
   public ProductResponse create(ProductCreateRequest req) {
     System.out.println(
@@ -110,6 +115,17 @@ public class ProductService {
     bizLog.info("[PRODUCT][DELETE][REQ] id={}", id);
     Product p = productRepository.findById(id)
         .orElseThrow(() -> new NoSuchElementException("상품을 찾을 수 없습니다."));
+
+    boolean usedInCart = cartItemRepository.existsByProduct_Id(id);
+    if (usedInCart) {
+      throw new IllegalStateException("장바구니에 담긴 상품은 삭제할 수 없습니다.");
+    }
+
+    boolean usedInOrders = orderItemRepository.existsByProduct_Id(id);
+    if (usedInOrders) {
+      throw new IllegalStateException("주문에 사용된 상품은 삭제할 수 없습니다.");
+    }
+
     if (p.getImageUrl() != null) {
       bizLog.info("[PRODUCT][IMAGE][DELETE] id={}, url={}", id, p.getImageUrl());
       fileStorageService.deleteByPublicUrl(p.getImageUrl());

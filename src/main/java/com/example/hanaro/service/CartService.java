@@ -152,6 +152,9 @@ public class CartService {
     if (product.getStockQuantity() < quantity) {
       throw new IllegalStateException("재고가 부족합니다.");
     }
+    if (!cartItemRepository.existsByCart_IdAndProduct_Id(cart.getId(), productId)) {
+      throw new IllegalArgumentException("장바구니에 해당 상품이 없습니다.");
+    }
 
     // 도메인 메서드 사용(없으면 기존 아이템 미존재 시 예외 없이 무시)
     cart.changeQuantity(productId, quantity);

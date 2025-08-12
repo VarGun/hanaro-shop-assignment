@@ -34,25 +34,25 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
       @Param("to") LocalDateTime to,
       @Param("keyword") String keyword);
 
-  /**
-   * 특정 사용자의 주문 전체 조회
-   */
-  @Query("""
-      select o from Order o
-      where o.user.id = :userId
-        and (:status is null or o.status = :status)
-        and (:fromDate is null or o.orderDate >= :fromDate)
-        and (:toDate is null or o.orderDate <= :toDate)
-      """)
-  Page<Order> userSearch(
-      @Param("userId") Long userId,
-      @Param("status") OrderStatus status,
-      @Param("fromDate") LocalDateTime fromDate,
-      @Param("toDate") LocalDateTime toDate,
-      Pageable pageable
-  );
-
-  List<Order> findByStatus(OrderStatus status);
+//  /**
+//   * 특정 사용자의 주문 전체 조회
+//   */
+//  @Query("""
+//      select o from Order o
+//      where o.user.id = :userId
+//        and (:status is null or o.status = :status)
+//        and (:fromDate is null or o.orderDate >= :fromDate)
+//        and (:toDate is null or o.orderDate <= :toDate)
+//      """)
+//  Page<Order> userSearch(
+//      @Param("userId") Long userId,
+//      @Param("status") OrderStatus status,
+//      @Param("fromDate") LocalDateTime fromDate,
+//      @Param("toDate") LocalDateTime toDate,
+//      Pageable pageable
+//  );
+//
+//  List<Order> findByStatus(OrderStatus status);
 
   /**
    * 특정 사용자의 주문 목록 (페이징 없이)
@@ -115,4 +115,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
       @Param("keyword") String keyword,
       Pageable pageable
   );
+
+  boolean existsByUser_Id(Long userId);
 }

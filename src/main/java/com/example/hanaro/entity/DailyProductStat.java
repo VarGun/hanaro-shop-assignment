@@ -11,7 +11,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "daily_product_stat")
-public class DailyProductStat {
+public class DailyProductStat extends BaseEntity {
 
   @EmbeddedId
   private DailyProductStatId id;

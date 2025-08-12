@@ -2,7 +2,10 @@ package com.example.hanaro.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -21,7 +24,7 @@ import lombok.Setter;
 public class User extends BaseEntity {
 
   @Id
-  @GeneratedValue
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
   @Column(nullable = false, unique = true)
@@ -33,6 +36,8 @@ public class User extends BaseEntity {
   private String name;
   private String phone;
 
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false, length = 20)
   private Role role = Role.USER; // 기본값
 
 }

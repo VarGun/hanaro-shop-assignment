@@ -52,6 +52,10 @@ public class UserService {
     User user = userRepository.findById(targetUserId)
         .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
+    if (req.email() != null && !req.email().equals(user.getEmail())) {
+      throw new IllegalArgumentException("이메일은 변경할 수 없습니다.");
+    }
+
     // 부분 수정(들어온 값만 반영)
     if (req.name() != null && !req.name().isBlank()) {
       user.setName(req.name().trim());

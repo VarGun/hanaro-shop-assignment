@@ -22,7 +22,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
-public class Product {
+public class Product extends BaseEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,8 +35,10 @@ public class Product {
   private String description;
 
   @Setter
+  @Column(name = "stock_quantity")
   private int stockQuantity;
 
+  @Column(name = "image_url")
   private String imageUrl;
 
   @CreatedDate

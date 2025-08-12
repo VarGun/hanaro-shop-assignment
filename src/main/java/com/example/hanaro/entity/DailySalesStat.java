@@ -9,7 +9,7 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "daily_sales_stat")
-public class DailySalesStat {
+public class DailySalesStat extends BaseEntity {
 
   @Id
   @Column(name = "stat_date", nullable = false)

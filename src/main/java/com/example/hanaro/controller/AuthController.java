@@ -5,7 +5,6 @@ import com.example.hanaro.dto.LoginResponse;
 import com.example.hanaro.dto.UserSignUpRequest;
 import com.example.hanaro.entity.Role;
 import com.example.hanaro.entity.User;
-import com.example.hanaro.repository.UserRepository;
 import com.example.hanaro.security.CustomUserDetails;
 import com.example.hanaro.security.JwtTokenProvider;
 import com.example.hanaro.service.UserService;
@@ -39,7 +38,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
   private final UserService userService;
-  private final UserRepository userRepository;
   private final AuthenticationManager authenticationManager;
   private final JwtTokenProvider jwtTokenProvider;
 

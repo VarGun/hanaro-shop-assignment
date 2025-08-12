@@ -1,8 +1,5 @@
 package com.example.hanaro.config;
 
-import com.example.hanaro.entity.Product;
-import com.example.hanaro.entity.Role;
-import com.example.hanaro.entity.User;
 import com.example.hanaro.repository.ProductRepository;
 import com.example.hanaro.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,70 +24,77 @@ public class AdminSeedConfig {
   @Value("${app.admin.password}")
   private String adminPassword;
 
+//  @Bean
+//  CommandLineRunner printHashes(org.springframework.security.crypto.password.PasswordEncoder enc) {
+//    return args -> {
+//      System.out.println("ADMIN_HASH=" + enc.encode("12345678"));
+//      System.out.println("USER1_HASH=" + enc.encode("Passw0rd!"));
+//    };
+//  }
+
   @Bean
   public ApplicationRunner adminSeeder() {
     return args -> {
-      if (!userRepository.existsByEmail(adminEmail)) {
-        userRepository.save(User.builder()
-            .email(adminEmail)
-            .password(passwordEncoder.encode(adminPassword))
-            .name("ADMIN USER")
-            .phone("010-0000-0000")
-            .role(Role.ADMIN)
-            .build());
-        System.out.println("Admin user created: " + adminEmail);
-      } else {
-        System.out.println("Admin already exists: " + adminEmail);
-      }
+//      if (!userRepository.existsByEmail(adminEmail)) {
+//        userRepository.save(User.builder()
+//            .email(adminEmail)
+//            .password(passwordEncoder.encode(adminPassword))
+//            .name("ADMIN USER")
+//            .phone("010-0000-0000")
+//            .role(Role.ADMIN)
+//            .build());
+//        System.out.println("Admin user created: " + adminEmail);
+//      } else {
+//        System.out.println("Admin already exists: " + adminEmail);
+//      }
 
-      // ==== TEMP SEEDING (LOCAL ONLY) - EASY TO REMOVE LATER ====
-      // 1) Regular USER seeding
-      String userEmail = "user1@aaa.com";
-      if (!userRepository.existsByEmail(userEmail)) {
-        userRepository.save(User.builder()
-            .email(userEmail)
-            .password(passwordEncoder.encode("Passw0rd!"))
-            .name("USER1")
-            .phone("010-0000-0000")
-            .role(Role.USER)
-            .build());
-        System.out.println("[SEED] User created: " + userEmail);
-      } else {
-        System.out.println("[SEED] User already exists: " + userEmail);
-      }
+//      // 1) Regular USER seeding
+//      String userEmail = "user1@aaa.com";
+//      if (!userRepository.existsByEmail(userEmail)) {
+//        userRepository.save(User.builder()
+//            .email(userEmail)
+//            .password(passwordEncoder.encode("Passw0rd!"))
+//            .name("USER1")
+//            .phone("010-0000-0000")
+//            .role(Role.USER)
+//            .build());
+//        System.out.println("[SEED] User created: " + userEmail);
+//      } else {
+//        System.out.println("[SEED] User already exists: " + userEmail);
+//      }
 
-      // 2) Product seeding (by unique name)
-      String seedProductName = "Product233";
-      boolean existsProduct = productRepository.existsByName(seedProductName);
-      if (!existsProduct) {
-        Product p = Product.builder()
-            .name(seedProductName)
-            .description("product desc")
-            .price(12000)
-            .stockQuantity(20)
-            .imageUrl(null)
-            .build();
-        productRepository.save(p);
-        System.out.println("[SEED] Product created: " + seedProductName);
-      } else {
-        System.out.println("[SEED] Product already exists: " + seedProductName);
-      }
-
-      String seedProductName2 = "Product22";
-      boolean existsProduct2 = productRepository.existsByName(seedProductName2);
-      if (!existsProduct2) {
-        Product p2 = Product.builder()
-            .name(seedProductName2)
-            .description("product desc")
-            .price(12000)
-            .stockQuantity(20)
-            .imageUrl(null)
-            .build();
-        productRepository.save(p2);
-        System.out.println("[SEED] Product created: " + seedProductName2);
-      } else {
-        System.out.println("[SEED] Product already exists: " + seedProductName2);
-      }
+//      // 2) Product seeding (by unique name)
+//      String seedProductName = "Product233";
+//      boolean existsProduct = productRepository.existsByName(seedProductName);
+//      if (!existsProduct) {
+//        Product p = Product.builder()
+//            .name(seedProductName)
+//            .description("product desc")
+//            .price(12000)
+//            .stockQuantity(20)
+//            .imageUrl(null)
+//            .build();
+//        productRepository.save(p);
+//        System.out.println("[SEED] Product created: " + seedProductName);
+//      } else {
+//        System.out.println("[SEED] Product already exists: " + seedProductName);
+//      }
+//
+//      String seedProductName2 = "Product22";
+//      boolean existsProduct2 = productRepository.existsByName(seedProductName2);
+//      if (!existsProduct2) {
+//        Product p2 = Product.builder()
+//            .name(seedProductName2)
+//            .description("product desc")
+//            .price(12000)
+//            .stockQuantity(20)
+//            .imageUrl(null)
+//            .build();
+//        productRepository.save(p2);
+//        System.out.println("[SEED] Product created: " + seedProductName2);
+//      } else {
+//        System.out.println("[SEED] Product already exists: " + seedProductName2);
+//      }
     };
   }
 }
